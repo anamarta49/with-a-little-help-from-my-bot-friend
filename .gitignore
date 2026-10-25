@@ -8,3 +8,5 @@ export_presets.cfg
 # OS/editor junk
 .DS_Store
 Thumbs.db
+/Bot Runner.console.exe
+/Bot Runner.exe
