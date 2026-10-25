@@ -1,0 +1,104 @@
+[gd_scene format=3 uid="uid://nintro01"]
+
+[ext_resource type="Script" path="res://scripts/Intro.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://gnarrator01" path="res://scenes/Narrator.tscn" id="2"]
+
+[sub_resource type="StyleBoxFlat" id="ChoiceStyle"]
+bg_color = Color(0.08, 0.08, 0.1, 0.95)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.3, 0.9, 0.4, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="Intro" type="Control"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+script = ExtResource("1")
+
+[node name="Background" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.02, 0.02, 0.04, 1)
+
+[node name="Terminal" type="Control" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="StoryLabel" type="RichTextLabel" parent="Terminal"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 60.0
+offset_top = 50.0
+offset_right = -60.0
+offset_bottom = -120.0
+theme_override_colors/default_color = Color(0.3, 0.95, 0.4, 1)
+theme_override_font_sizes/normal_font_size = 18
+bbcode_enabled = false
+scroll_active = false
+
+[node name="PromptLabel" type="Label" parent="Terminal"]
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -80.0
+offset_bottom = -40.0
+theme_override_colors/font_color = Color(0.3, 0.95, 0.4, 1)
+theme_override_font_sizes/font_size = 20
+horizontal_alignment = 1
+text = "Press SPACE to continue"
+visible = false
+
+[node name="Trusty" parent="." instance=ExtResource("2")]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -236.0
+offset_top = -202.0
+offset_right = -16.0
+offset_bottom = -16.0
+visible = false
+
+[node name="ChoicePanel" type="Panel" parent="."]
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -130.0
+offset_top = -90.0
+offset_right = 130.0
+offset_bottom = -20.0
+theme_override_styles/panel = SubResource("ChoiceStyle")
+visible = false
+
+[node name="HBoxContainer" type="HBoxContainer" parent="ChoicePanel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -90.0
+offset_top = -18.0
+offset_right = 90.0
+offset_bottom = 18.0
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="YesButton" type="Button" parent="ChoicePanel/HBoxContainer"]
+layout_mode = 2
+text = "Yes"
+
+[node name="NoButton" type="Button" parent="ChoicePanel/HBoxContainer"]
+layout_mode = 2
+text = "No"
