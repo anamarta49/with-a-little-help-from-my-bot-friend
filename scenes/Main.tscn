@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://fmain01"]
+[gd_scene load_steps=4 format=3 uid="uid://fmain01"]
 
 [ext_resource type="Script" path="res://scripts/Main.gd" id="1"]
 [ext_resource type="PackedScene" uid="uid://b2xplayer01" path="res://scenes/Player.tscn" id="2"]
+[ext_resource type="PackedScene" uid="uid://gnarrator01" path="res://scenes/Narrator.tscn" id="3"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1")
@@ -27,14 +28,14 @@ offset_bottom = 70.0
 theme_override_font_sizes/font_size = 18
 text = "Best: 0"
 
-[node name="BotAnchor" type="Control" parent="UI"]
+[node name="Narrator" parent="UI" instance=ExtResource("3")]
 anchors_preset = 3
 anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -160.0
-offset_top = -160.0
+offset_left = -236.0
+offset_top = -186.0
 offset_right = -16.0
 offset_bottom = -16.0
 

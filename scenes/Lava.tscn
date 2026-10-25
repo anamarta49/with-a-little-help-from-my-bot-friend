@@ -1,0 +1,19 @@
+[gd_scene format=3 uid="uid://ilava01"]
+
+[sub_resource type="RectangleShape2D" id="LavaShape"]
+size = Vector2(180, 16)
+
+[node name="Lava" type="Area2D" groups=["deadly"]]
+collision_layer = 2
+collision_mask = 0
+
+[node name="ColorRect" type="ColorRect" parent="."]
+offset_left = -90.0
+offset_top = -16.0
+offset_right = 90.0
+offset_bottom = 0.0
+color = Color(1.0, 0.35, 0.05, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -8)
+shape = SubResource("LavaShape")
