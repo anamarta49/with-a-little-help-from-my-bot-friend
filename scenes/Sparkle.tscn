@@ -1,0 +1,19 @@
+[gd_scene format=3 uid="uid://sparkle01"]
+
+[sub_resource type="ParticleProcessMaterial" id="SparkleMat"]
+direction = Vector3(0, -1, 0)
+spread = 180.0
+initial_velocity_min = 60.0
+initial_velocity_max = 160.0
+gravity = Vector3(0, 200, 0)
+scale_min = 0.5
+scale_max = 1.4
+color = Color(1, 0.85, 0.2, 1)
+
+[node name="Sparkle" type="GPUParticles2D"]
+emitting = false
+amount = 18
+lifetime = 0.6
+one_shot = true
+explosiveness = 0.9
+process_material = SubResource("SparkleMat")

@@ -173,6 +173,16 @@ func _on_progress_changed(new_value: int) -> void:
 func _on_hallucinations_changed(new_value: int) -> void:
 	hallucinations_label.text = "Hallucinations Caught: %d" % new_value
 	high_score_label.text = "Best: %d" % Game.high_score
+	if new_value > 0:
+		_pop_label(hallucinations_label)
+
+func _pop_label(lbl: Label) -> void:
+	lbl.pivot_offset = lbl.size / 2.0
+	var tween := create_tween()
+	tween.tween_property(lbl, "scale", Vector2(1.3, 1.3), 0.08) \
+		.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.tween_property(lbl, "scale", Vector2.ONE, 0.14) \
+		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 
 func _on_player_died() -> void:
 	pass

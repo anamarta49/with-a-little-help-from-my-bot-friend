@@ -1,7 +1,8 @@
-[gd_scene format=3 uid="uid://nintro01"]
+[gd_scene load_steps=5 format=3 uid="uid://nintro01"]
 
 [ext_resource type="Script" path="res://scripts/Intro.gd" id="1"]
 [ext_resource type="PackedScene" uid="uid://gnarrator01" path="res://scenes/Narrator.tscn" id="2"]
+[ext_resource type="Shader" path="res://shaders/crt_overlay.gdshader" id="3"]
 
 [sub_resource type="StyleBoxFlat" id="ChoiceStyle"]
 bg_color = Color(0.08, 0.08, 0.1, 0.95)
@@ -14,6 +15,9 @@ corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
+
+[sub_resource type="ShaderMaterial" id="CrtMat"]
+shader = ExtResource("3")
 
 [node name="Intro" type="Control"]
 anchors_preset = 15
@@ -102,3 +106,14 @@ text = "Yes"
 [node name="NoButton" type="Button" parent="ChoicePanel/HBoxContainer"]
 layout_mode = 2
 text = "No"
+
+[node name="CrtOverlay" type="CanvasLayer" parent="."]
+layer = 10
+
+[node name="CrtRect" type="ColorRect" parent="CrtOverlay"]
+material = SubResource("CrtMat")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+color = Color(0, 0, 0, 1)

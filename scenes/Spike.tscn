@@ -1,13 +1,19 @@
-[gd_scene load_steps=2 format=3 uid="uid://dspike01"]
+[gd_scene load_steps=4 format=3 uid="uid://dspike01"]
+
+[ext_resource type="Shader" path="res://shaders/glitch.gdshader" id="2"]
 
 [sub_resource type="RectangleShape2D" id="SpikeShape"]
 size = Vector2(36, 36)
+
+[sub_resource type="ShaderMaterial" id="GlitchMat"]
+shader = ExtResource("2")
 
 [node name="Spike" type="Area2D" groups=["deadly"]]
 collision_layer = 2
 collision_mask = 0
 
 [node name="ColorRect" type="ColorRect" parent="."]
+material = SubResource("GlitchMat")
 offset_left = -18.0
 offset_top = -36.0
 offset_right = 18.0

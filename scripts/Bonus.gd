@@ -2,6 +2,8 @@ extends Area2D
 ## Camouflaged bonus pickup: looks exactly like a hazard but rewards points
 ## and plays a cute animation when the player touches it, instead of killing them.
 
+const SparkleScene := preload("res://scenes/Sparkle.tscn")
+
 @export var points: int = 100
 
 var _collected: bool = false
@@ -13,7 +15,16 @@ func collect() -> void:
 	set_deferred("monitoring", false)
 	set_deferred("monitorable", false)
 	Game.add_hallucination(points)
+	_spawn_sparkles()
 	_play_pickup_animation()
+
+func _spawn_sparkles() -> void:
+	var sparkle: GPUParticles2D = SparkleScene.instantiate()
+	get_parent().add_child(sparkle)
+	sparkle.global_position = global_position
+	sparkle.emitting = true
+	sparkle.restart()
+	get_tree().create_timer(sparkle.lifetime + 0.1).timeout.connect(sparkle.queue_free)
 
 func _play_pickup_animation() -> void:
 	var tween := create_tween()

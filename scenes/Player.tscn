@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=3 uid="uid://b2xplayer01"]
+[gd_scene load_steps=6 format=3 uid="uid://b2xplayer01"]
 
 [ext_resource type="Script" path="res://scripts/Player.gd" id="1"]
 
@@ -7,6 +7,26 @@ size = Vector2(40, 64)
 
 [sub_resource type="RectangleShape2D" id="CrouchShape"]
 size = Vector2(40, 32)
+
+[sub_resource type="ParticleProcessMaterial" id="DustMat"]
+direction = Vector3(-1, -0.3, 0)
+spread = 20.0
+gravity = Vector3(0, 300, 0)
+initial_velocity_min = 20.0
+initial_velocity_max = 60.0
+scale_min = 0.5
+scale_max = 1.1
+color = Color(0.55, 0.45, 0.35, 0.6)
+
+[sub_resource type="ParticleProcessMaterial" id="LandMat"]
+direction = Vector3(0, -1, 0)
+spread = 140.0
+gravity = Vector3(0, 500, 0)
+initial_velocity_min = 80.0
+initial_velocity_max = 180.0
+scale_min = 0.4
+scale_max = 1.0
+color = Color(0.6, 0.55, 0.5, 0.7)
 
 [node name="Player" type="CharacterBody2D"]
 collision_layer = 1
@@ -46,5 +66,19 @@ disabled = true
 position_smoothing_enabled = true
 position_smoothing_speed = 8.0
 offset = Vector2(200, -100)
+
+[node name="DustTrail" type="GPUParticles2D" parent="."]
+emitting = false
+amount = 8
+lifetime = 0.5
+process_material = SubResource("DustMat")
+
+[node name="LandBurst" type="GPUParticles2D" parent="."]
+emitting = false
+amount = 14
+lifetime = 0.4
+one_shot = true
+explosiveness = 0.9
+process_material = SubResource("LandMat")
 
 [connection signal="area_entered" from="Hitbox" to="." method="_on_hitbox_area_entered"]

@@ -1,0 +1,60 @@
+[gd_scene format=3 uid="uid://parallaxbg01"]
+
+[sub_resource type="Gradient" id="SkyGradient"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(0.04, 0.03, 0.1, 1, 0.22, 0.1, 0.32, 1)
+
+[sub_resource type="GradientTexture2D" id="SkyTex"]
+gradient = SubResource("SkyGradient")
+width = 4
+height = 540
+fill_to = Vector2(0, 1)
+
+[sub_resource type="ParticleProcessMaterial" id="StarMat"]
+direction = Vector3(0, 0, 0)
+spread = 0.0
+gravity = Vector3(0, 0, 0)
+initial_velocity_min = 0.0
+initial_velocity_max = 0.0
+scale_min = 0.6
+scale_max = 1.6
+color = Color(0.8, 0.85, 1, 0.8)
+
+[node name="ParallaxBG" type="ParallaxBackground"]
+
+[node name="Sky" type="ParallaxLayer" parent="."]
+motion_scale = Vector2(1, 1)
+
+[node name="SkyRect" type="Sprite2D" parent="Sky"]
+position = Vector2(480, -230)
+scale = Vector2(300, 1.6)
+texture = SubResource("SkyTex")
+
+[node name="Stars" type="ParallaxLayer" parent="."]
+motion_scale = Vector2(0.15, 0.15)
+motion_mirroring = Vector2(900, 0)
+
+[node name="StarField" type="GPUParticles2D" parent="Stars"]
+position = Vector2(450, -250)
+amount = 40
+lifetime = 4.0
+preprocess = 4.0
+speed_scale = 0.05
+visibility_rect = Rect2(-500, -300, 1800, 500)
+process_material = SubResource("StarMat")
+
+[node name="FarHills" type="ParallaxLayer" parent="."]
+motion_scale = Vector2(0.3, 1.0)
+motion_mirroring = Vector2(800, 0)
+
+[node name="HillsPolygon" type="Polygon2D" parent="FarHills"]
+color = Color(0.16, 0.12, 0.26, 1)
+polygon = PackedVector2Array(0, 40, 0, -20, 100, -160, 200, -40, 300, -180, 400, -60, 500, -150, 600, -50, 700, -170, 800, -30, 800, 40)
+
+[node name="NearBumps" type="ParallaxLayer" parent="."]
+motion_scale = Vector2(0.6, 1.0)
+motion_mirroring = Vector2(400, 0)
+
+[node name="BumpsPolygon" type="Polygon2D" parent="NearBumps"]
+color = Color(0.22, 0.17, 0.3, 1)
+polygon = PackedVector2Array(0, 40, 0, -10, 60, -70, 120, -15, 180, -80, 240, -20, 300, -75, 360, -5, 400, 40)

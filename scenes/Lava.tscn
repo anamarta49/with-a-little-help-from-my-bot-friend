@@ -1,13 +1,19 @@
-[gd_scene format=3 uid="uid://ilava01"]
+[gd_scene load_steps=3 format=3 uid="uid://ilava01"]
+
+[ext_resource type="Shader" path="res://shaders/glitch.gdshader" id="2"]
 
 [sub_resource type="RectangleShape2D" id="LavaShape"]
 size = Vector2(180, 16)
+
+[sub_resource type="ShaderMaterial" id="GlitchMat"]
+shader = ExtResource("2")
 
 [node name="Lava" type="Area2D" groups=["deadly"]]
 collision_layer = 2
 collision_mask = 0
 
 [node name="ColorRect" type="ColorRect" parent="."]
+material = SubResource("GlitchMat")
 offset_left = -90.0
 offset_top = -16.0
 offset_right = 90.0

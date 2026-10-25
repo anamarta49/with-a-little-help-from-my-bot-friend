@@ -4,6 +4,9 @@ extends Control
 @onready var bubble: Panel = $SpeechBubble
 @onready var label: Label = $SpeechBubble/MarginContainer/Label
 @onready var hide_timer: Timer = $HideTimer
+@onready var bot_body: ColorRect = $BotBody
+@onready var eye_left: ColorRect = $BotBody/BotEyeLeft
+@onready var eye_right: ColorRect = $BotBody/BotEyeRight
 
 const ACTION_TEXT := {
 	"jump": "Jump!",
@@ -21,10 +24,46 @@ const BASE_FONT_SIZE := 24
 const MIN_FONT_SIZE := 14
 const SHRINK_AFTER_CHARS := 12
 
+var _bot_base_y: float
+var _blink_timer: Timer
+
 func _ready() -> void:
 	bubble.visible = false
 	hide_timer.one_shot = true
 	hide_timer.timeout.connect(_on_hide_timer_timeout)
+	_bot_base_y = bot_body.position.y
+	eye_left.pivot_offset = eye_left.size / 2.0
+	eye_right.pivot_offset = eye_right.size / 2.0
+	_start_idle_bob()
+	_start_blinking()
+
+## Gentle looping bob so Trusty isn't a static statue between lines.
+func _start_idle_bob() -> void:
+	var tween := create_tween()
+	tween.set_loops()
+	tween.tween_property(bot_body, "position:y", _bot_base_y - 6.0, 1.1) \
+		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	tween.tween_property(bot_body, "position:y", _bot_base_y, 1.1) \
+		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+
+## Occasional quick blink (eyes squash flat then back) at random intervals.
+func _start_blinking() -> void:
+	_blink_timer = Timer.new()
+	_blink_timer.one_shot = true
+	add_child(_blink_timer)
+	_blink_timer.timeout.connect(_do_blink)
+	_schedule_next_blink()
+
+func _schedule_next_blink() -> void:
+	_blink_timer.start(randf_range(2.0, 5.0))
+
+func _do_blink() -> void:
+	var tween := create_tween()
+	tween.tween_property(eye_left, "scale:y", 0.1, 0.06)
+	tween.parallel().tween_property(eye_right, "scale:y", 0.1, 0.06)
+	tween.tween_property(eye_left, "scale:y", 1.0, 0.08)
+	tween.parallel().tween_property(eye_right, "scale:y", 1.0, 0.08)
+	_schedule_next_blink()
 
 func say(action: String, duration: float = 1.4) -> void:
 	var text: String
