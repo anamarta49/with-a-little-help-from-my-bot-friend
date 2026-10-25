@@ -8,6 +8,9 @@ const SparkleScene := preload("res://scenes/Sparkle.tscn")
 
 var _collected: bool = false
 
+func is_collected() -> bool:
+	return _collected
+
 func collect() -> void:
 	if _collected:
 		return

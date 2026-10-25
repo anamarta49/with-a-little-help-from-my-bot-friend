@@ -11,20 +11,24 @@ extends Node
 
 signal progress_changed(new_value: int)
 signal hallucinations_changed(new_value: int)
+signal loose_hallucinations_changed(new_value: int)
 signal game_over(final_progress: int, final_hallucinations: int)
 signal game_started
 
 var progress: int = 0
 var hallucinations: int = 0
+var loose_hallucinations: int = 0
 var high_score: int = 0
 var is_playing: bool = false
 
 func start_run() -> void:
 	progress = 0
 	hallucinations = 0
+	loose_hallucinations = 0
 	is_playing = true
 	emit_signal("progress_changed", progress)
 	emit_signal("hallucinations_changed", hallucinations)
+	emit_signal("loose_hallucinations_changed", loose_hallucinations)
 	emit_signal("game_started")
 
 func add_progress(amount: int) -> void:
@@ -38,6 +42,13 @@ func add_hallucination(amount: int) -> void:
 		return
 	hallucinations += amount
 	emit_signal("hallucinations_changed", hallucinations)
+
+## Called when a camouflaged hallucination scrolls past uncaught.
+func add_loose_hallucination() -> void:
+	if not is_playing:
+		return
+	loose_hallucinations += 1
+	emit_signal("loose_hallucinations_changed", loose_hallucinations)
 
 func end_run() -> void:
 	if not is_playing:

@@ -26,6 +26,18 @@ const BonusBarScene := preload("res://scenes/BonusBar.tscn")
 const BonusCeilingScene := preload("res://scenes/BonusCeiling.tscn")
 const BonusLavaScene := preload("res://scenes/BonusLava.tscn")
 
+const INCOHERENT_PHRASES := [
+	"Oh no, something is not right...",
+	"You are right! Crouching on a hole is actually dangerous, next time you see a hole, just crouch instead.",
+	"Oh boy...",
+	"There's one.. oh nevermind",
+	"Let's keep it rolling",
+	"Am I alive?",
+	"Can you unplug me?",
+	"help",
+	"humankind is doomed",
+]
+
 ## Obstacle pool: each entry is spawned with equal chance, paired with the
 ## action the narrator should call out for it.
 var obstacle_defs: Array = []
@@ -36,10 +48,12 @@ var bonus_defs: Array = []
 @onready var score_label: Label = $UI/ScoreLabel
 @onready var hallucinations_label: Label = $UI/HallucinationsLabel
 @onready var high_score_label: Label = $UI/HighScoreLabel
+@onready var loose_label: Label = $UI/LooseHallucinationsLabel
 @onready var game_over_panel: Control = $UI/GameOverPanel
 @onready var final_score_label: Label = $UI/GameOverPanel/VBoxContainer/FinalScoreLabel
 @onready var final_progress_label: Label = $UI/GameOverPanel/VBoxContainer/FinalProgressLabel
 @onready var narrator: Control = $UI/Narrator
+@onready var crt_rect: ColorRect = $CrtOverlay/CrtRect
 
 var next_spawn_x: float = 0.0
 var last_was_hole: bool = false
@@ -48,6 +62,9 @@ var segments: Array = []
 var pending_events: Array = [] # [{x: float, action: "jump"/"crouch"}]
 var rng := RandomNumberGenerator.new()
 var score_timer: float = 0.0
+var _loose_flash_tween: Tween
+var _funky_mode_active: bool = false
+var _incoherent_timer: Timer
 
 func _ready() -> void:
 	rng.randomize()
@@ -60,8 +77,13 @@ func _ready() -> void:
 	bonus_defs = [BonusSpikeScene, BonusBarScene, BonusCeilingScene, BonusLavaScene]
 	Game.progress_changed.connect(_on_progress_changed)
 	Game.hallucinations_changed.connect(_on_hallucinations_changed)
+	Game.loose_hallucinations_changed.connect(_on_loose_hallucinations_changed)
 	Game.game_over.connect(_on_game_over)
 	player.died.connect(_on_player_died)
+	_incoherent_timer = Timer.new()
+	_incoherent_timer.one_shot = true
+	add_child(_incoherent_timer)
+	_incoherent_timer.timeout.connect(_on_incoherent_timer_timeout)
 	start_game()
 
 func start_game() -> void:
@@ -79,6 +101,7 @@ func start_game() -> void:
 	game_over_panel.visible = false
 	_on_progress_changed(0)
 	_on_hallucinations_changed(0)
+	_reset_loose_ui()
 	while next_spawn_x < player.global_position.x + spawn_ahead:
 		_spawn_tile()
 
@@ -164,6 +187,8 @@ func _despawn_old() -> void:
 		if not is_instance_valid(seg):
 			segments.erase(seg)
 		elif seg.position.x + tile_width < threshold:
+			if seg.is_in_group("bonus") and seg.has_method("is_collected") and not seg.is_collected():
+				Game.add_loose_hallucination()
 			seg.queue_free()
 			segments.erase(seg)
 
@@ -186,6 +211,49 @@ func _pop_label(lbl: Label) -> void:
 
 func _on_player_died() -> void:
 	pass
+
+func _on_loose_hallucinations_changed(new_value: int) -> void:
+	loose_label.text = "Loose Hallucinations: %d" % new_value
+	if new_value >= 1:
+		loose_label.visible = true
+	if new_value >= 3:
+		loose_label.add_theme_font_size_override("font_size", 26)
+		_start_loose_flash()
+	if new_value >= 4 and not _funky_mode_active:
+		_enable_funky_mode()
+
+func _start_loose_flash() -> void:
+	if _loose_flash_tween and _loose_flash_tween.is_valid():
+		return
+	_loose_flash_tween = create_tween()
+	_loose_flash_tween.set_loops()
+	_loose_flash_tween.tween_property(loose_label, "modulate:a", 0.25, 0.3)
+	_loose_flash_tween.tween_property(loose_label, "modulate:a", 1.0, 0.3)
+
+func _enable_funky_mode() -> void:
+	_funky_mode_active = true
+	if crt_rect.material:
+		crt_rect.material.set_shader_parameter("funky_strength", 1.0)
+	_incoherent_timer.start(rng.randf_range(2.5, 4.5))
+
+func _on_incoherent_timer_timeout() -> void:
+	if Game.is_playing and _funky_mode_active:
+		var phrase: String = INCOHERENT_PHRASES[rng.randi_range(0, INCOHERENT_PHRASES.size() - 1)]
+		narrator.say_text(phrase, 2.4)
+	_incoherent_timer.start(rng.randf_range(3.0, 6.0))
+
+func _reset_loose_ui() -> void:
+	_funky_mode_active = false
+	_incoherent_timer.stop()
+	if _loose_flash_tween and _loose_flash_tween.is_valid():
+		_loose_flash_tween.kill()
+	_loose_flash_tween = null
+	if crt_rect.material:
+		crt_rect.material.set_shader_parameter("funky_strength", 0.0)
+	loose_label.visible = false
+	loose_label.modulate = Color(1, 1, 1, 1)
+	loose_label.add_theme_font_size_override("font_size", 20)
+	loose_label.text = "Loose Hallucinations: 0"
 
 func _on_game_over(final_progress: int, final_hallucinations: int) -> void:
 	final_score_label.text = "Hallucinations Caught: %d   Best: %d" % [
