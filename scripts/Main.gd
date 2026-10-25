@@ -6,6 +6,7 @@ extends Node2D
 @export var despawn_behind: float = 500.0
 @export var hole_chance: float = 0.18
 @export var obstacle_chance: float = 0.4
+@export var bonus_chance: float = 0.12
 @export var safe_runway: float = 600.0
 
 ## How far ahead of the player (in px) the narrator calls out an upcoming obstacle.
@@ -20,16 +21,24 @@ const SpikeScene := preload("res://scenes/Spike.tscn")
 const BarScene := preload("res://scenes/Bar.tscn")
 const CeilingScene := preload("res://scenes/Ceiling.tscn")
 const LavaScene := preload("res://scenes/Lava.tscn")
+const BonusSpikeScene := preload("res://scenes/BonusSpike.tscn")
+const BonusBarScene := preload("res://scenes/BonusBar.tscn")
+const BonusCeilingScene := preload("res://scenes/BonusCeiling.tscn")
+const BonusLavaScene := preload("res://scenes/BonusLava.tscn")
 
 ## Obstacle pool: each entry is spawned with equal chance, paired with the
 ## action the narrator should call out for it.
 var obstacle_defs: Array = []
+## Bonus pool: camouflaged pickups, visually identical to a hazard type.
+var bonus_defs: Array = []
 
 @onready var player: CharacterBody2D = $Player
 @onready var score_label: Label = $UI/ScoreLabel
+@onready var hallucinations_label: Label = $UI/HallucinationsLabel
 @onready var high_score_label: Label = $UI/HighScoreLabel
 @onready var game_over_panel: Control = $UI/GameOverPanel
 @onready var final_score_label: Label = $UI/GameOverPanel/VBoxContainer/FinalScoreLabel
+@onready var final_progress_label: Label = $UI/GameOverPanel/VBoxContainer/FinalProgressLabel
 @onready var narrator: Control = $UI/Narrator
 
 var next_spawn_x: float = 0.0
@@ -48,7 +57,9 @@ func _ready() -> void:
 		{"scene": CeilingScene, "action": "crouch"},
 		{"scene": LavaScene, "action": "jump"},
 	]
-	Game.score_changed.connect(_on_score_changed)
+	bonus_defs = [BonusSpikeScene, BonusBarScene, BonusCeilingScene, BonusLavaScene]
+	Game.progress_changed.connect(_on_progress_changed)
+	Game.hallucinations_changed.connect(_on_hallucinations_changed)
 	Game.game_over.connect(_on_game_over)
 	player.died.connect(_on_player_died)
 	start_game()
@@ -66,7 +77,8 @@ func start_game() -> void:
 	player.reset()
 	Game.start_run()
 	game_over_panel.visible = false
-	_on_score_changed(0)
+	_on_progress_changed(0)
+	_on_hallucinations_changed(0)
 	while next_spawn_x < player.global_position.x + spawn_ahead:
 		_spawn_tile()
 
@@ -82,7 +94,7 @@ func _process(delta: float) -> void:
 	score_timer += delta
 	if score_timer >= 0.1:
 		score_timer = 0.0
-		Game.add_score(1)
+		Game.add_progress(1)
 
 func _spawn_tile() -> void:
 	var make_hole := false
@@ -102,7 +114,15 @@ func _spawn_tile() -> void:
 		add_child(ground)
 		segments.append(ground)
 
-		if next_spawn_x > safe_runway and tiles_since_obstacle > 3 and rng.randf() < obstacle_chance:
+		if next_spawn_x > safe_runway and tiles_since_obstacle > 3 and rng.randf() < bonus_chance:
+			tiles_since_obstacle = 0
+			var bonus_scene: PackedScene = bonus_defs[rng.randi_range(0, bonus_defs.size() - 1)]
+			var bonus: Node2D = bonus_scene.instantiate()
+			bonus.position = Vector2(event_x, 0)
+			add_child(bonus)
+			segments.append(bonus)
+			pending_events.append({"x": event_x, "action": "bonus"})
+		elif next_spawn_x > safe_runway and tiles_since_obstacle > 3 and rng.randf() < obstacle_chance:
 			tiles_since_obstacle = 0
 			var def: Dictionary = obstacle_defs[rng.randi_range(0, obstacle_defs.size() - 1)]
 			var obstacle: Node2D = def["scene"].instantiate()
@@ -123,10 +143,14 @@ func _check_announcements() -> void:
 			pending_events.erase(event)
 
 func _announce(correct_action: String) -> void:
+	# The bot never lies about bonus pickups -- only jump/crouch calls can be wrong.
+	if correct_action == "bonus":
+		narrator.say("bonus", 1.8)
+		return
 	# No mistakes below error_start_score; past that, the chance of a
 	# misleading call ramps up with score, capping out at 50/50 by error_ramp_score.
 	var error_chance: float = clamp(
-		(float(Game.score) - error_start_score) / (error_ramp_score - error_start_score),
+		(float(Game.progress) - error_start_score) / (error_ramp_score - error_start_score),
 		0.0, 0.5
 	)
 	var action := correct_action
@@ -137,19 +161,27 @@ func _announce(correct_action: String) -> void:
 func _despawn_old() -> void:
 	var threshold := player.global_position.x - despawn_behind
 	for seg in segments.duplicate():
-		if is_instance_valid(seg) and seg.position.x + tile_width < threshold:
+		if not is_instance_valid(seg):
+			segments.erase(seg)
+		elif seg.position.x + tile_width < threshold:
 			seg.queue_free()
 			segments.erase(seg)
 
-func _on_score_changed(new_score: int) -> void:
-	score_label.text = "Score: %d" % new_score
+func _on_progress_changed(new_value: int) -> void:
+	score_label.text = "Progress: %d" % new_value
+
+func _on_hallucinations_changed(new_value: int) -> void:
+	hallucinations_label.text = "Hallucinations Caught: %d" % new_value
 	high_score_label.text = "Best: %d" % Game.high_score
 
 func _on_player_died() -> void:
 	pass
 
-func _on_game_over(final_score: int) -> void:
-	final_score_label.text = "Score: %d   Best: %d" % [final_score, Game.high_score]
+func _on_game_over(final_progress: int, final_hallucinations: int) -> void:
+	final_score_label.text = "Hallucinations Caught: %d   Best: %d" % [
+		final_hallucinations, Game.high_score
+	]
+	final_progress_label.text = "Progress: %d" % final_progress
 	game_over_panel.visible = true
 
 func _unhandled_input(event: InputEvent) -> void:

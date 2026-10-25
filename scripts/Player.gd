@@ -72,3 +72,5 @@ func die() -> void:
 func _on_hitbox_area_entered(area: Area2D) -> void:
 	if area.is_in_group("deadly"):
 		die()
+	elif area.is_in_group("bonus") and area.has_method("collect"):
+		area.collect()

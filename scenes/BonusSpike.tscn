@@ -1,0 +1,22 @@
+[gd_scene format=3 uid="uid://bkuwoox7d5nii"]
+
+[ext_resource type="Script" path="res://scripts/Bonus.gd" id="1"]
+
+[sub_resource type="RectangleShape2D" id="SpikeShape"]
+size = Vector2(36, 36)
+
+[node name="BonusSpike" type="Area2D" groups=["bonus"]]
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("1")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+offset_left = -18.0
+offset_top = -36.0
+offset_right = 18.0
+offset_bottom = 0.0
+color = Color(0.8, 0.1, 0.1, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -18)
+shape = SubResource("SpikeShape")

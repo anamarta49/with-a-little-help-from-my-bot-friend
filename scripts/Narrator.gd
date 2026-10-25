@@ -10,13 +10,23 @@ const ACTION_TEXT := {
 	"crouch": "Crouch!",
 }
 
+const BONUS_PHRASES := [
+	"There's one, catch it!",
+	"Hallucination!!",
+	"Looks sus...",
+	"Jump on him!",
+]
+
 func _ready() -> void:
 	bubble.visible = false
 	hide_timer.one_shot = true
 	hide_timer.timeout.connect(_on_hide_timer_timeout)
 
 func say(action: String, duration: float = 1.4) -> void:
-	label.text = ACTION_TEXT.get(action, action.capitalize())
+	if action == "bonus":
+		label.text = BONUS_PHRASES[randi() % BONUS_PHRASES.size()]
+	else:
+		label.text = ACTION_TEXT.get(action, action.capitalize())
 	bubble.visible = true
 	hide_timer.start(duration)
 
