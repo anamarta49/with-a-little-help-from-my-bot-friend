@@ -6,7 +6,7 @@ extends Node2D
 @export var despawn_behind: float = 500.0
 @export var hole_chance: float = 0.18
 @export var obstacle_chance: float = 0.4
-@export var bonus_chance: float = 0.12
+@export var bonus_chance: float = 0.25
 @export var safe_runway: float = 600.0
 
 ## How far ahead of the player (in px) the narrator calls out an upcoming obstacle.
@@ -50,6 +50,7 @@ var bonus_defs: Array = []
 @onready var high_score_label: Label = $UI/HighScoreLabel
 @onready var loose_label: Label = $UI/LooseHallucinationsLabel
 @onready var game_over_panel: Control = $UI/GameOverPanel
+@onready var new_high_score_banner: Control = $UI/NewHighScoreBanner
 @onready var final_score_label: Label = $UI/GameOverPanel/VBoxContainer/FinalScoreLabel
 @onready var final_progress_label: Label = $UI/GameOverPanel/VBoxContainer/FinalProgressLabel
 @onready var narrator: Control = $UI/Narrator
@@ -99,6 +100,7 @@ func start_game() -> void:
 	player.reset()
 	Game.start_run()
 	game_over_panel.visible = false
+	new_high_score_banner.hide_banner()
 	_on_progress_changed(0)
 	_on_hallucinations_changed(0)
 	_reset_loose_ui()
@@ -242,25 +244,37 @@ func _on_incoherent_timer_timeout() -> void:
 		narrator.say_text(phrase, 2.4)
 	_incoherent_timer.start(rng.randf_range(3.0, 6.0))
 
-func _reset_loose_ui() -> void:
+func _stop_funky_effects() -> void:
 	_funky_mode_active = false
 	_incoherent_timer.stop()
 	if _loose_flash_tween and _loose_flash_tween.is_valid():
 		_loose_flash_tween.kill()
 	_loose_flash_tween = null
+	loose_label.modulate = Color(1, 1, 1, 1)
 	if crt_rect.material:
 		crt_rect.material.set_shader_parameter("funky_strength", 0.0)
+
+func _reset_loose_ui() -> void:
+	_stop_funky_effects()
 	loose_label.visible = false
-	loose_label.modulate = Color(1, 1, 1, 1)
 	loose_label.add_theme_font_size_override("font_size", 20)
 	loose_label.text = "Loose Hallucinations: 0"
 
-func _on_game_over(final_progress: int, final_hallucinations: int) -> void:
+func _on_game_over(
+	final_progress: int, final_hallucinations: int, is_new_high_score: bool
+) -> void:
 	final_score_label.text = "Hallucinations Caught: %d   Best: %d" % [
 		final_hallucinations, Game.high_score
 	]
 	final_progress_label.text = "Progress: %d" % final_progress
 	game_over_panel.visible = true
+	_stop_funky_effects()
+	var line := "Wow you are becoming a PRO!" if is_new_high_score else "That was a good effort"
+	narrator.say_text(line, 0.0)
+	if is_new_high_score:
+		new_high_score_banner.show_text("New High Score!")
+	else:
+		new_high_score_banner.hide_banner()
 
 func _unhandled_input(event: InputEvent) -> void:
 	if game_over_panel.visible and event.is_action_pressed("restart"):

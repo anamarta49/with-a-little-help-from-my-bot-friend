@@ -1,10 +1,11 @@
-[gd_scene load_steps=7 format=3 uid="uid://fmain01"]
+[gd_scene load_steps=8 format=3 uid="uid://fmain01"]
 
 [ext_resource type="Script" path="res://scripts/Main.gd" id="1"]
 [ext_resource type="PackedScene" uid="uid://b2xplayer01" path="res://scenes/Player.tscn" id="2"]
 [ext_resource type="PackedScene" uid="uid://gnarrator01" path="res://scenes/Narrator.tscn" id="3"]
 [ext_resource type="PackedScene" uid="uid://parallaxbg01" path="res://scenes/ParallaxBG.tscn" id="4"]
 [ext_resource type="Shader" path="res://shaders/crt_overlay.gdshader" id="5"]
+[ext_resource type="Script" path="res://scripts/NewHighScoreBanner.gd" id="6"]
 
 [sub_resource type="ShaderMaterial" id="CrtMat"]
 shader = ExtResource("5")
@@ -76,6 +77,19 @@ offset_top = -100.0
 offset_right = 200.0
 offset_bottom = 100.0
 visible = false
+
+[node name="NewHighScoreBanner" type="Control" parent="UI"]
+visible = false
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 0.0
+offset_top = -150.0
+offset_right = 0.0
+offset_bottom = -150.0
+mouse_filter = 2
+script = ExtResource("6")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="UI/GameOverPanel"]
 layout_mode = 1

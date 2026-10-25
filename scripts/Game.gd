@@ -12,7 +12,7 @@ extends Node
 signal progress_changed(new_value: int)
 signal hallucinations_changed(new_value: int)
 signal loose_hallucinations_changed(new_value: int)
-signal game_over(final_progress: int, final_hallucinations: int)
+signal game_over(final_progress: int, final_hallucinations: int, is_new_high_score: bool)
 signal game_started
 
 var progress: int = 0
@@ -54,6 +54,8 @@ func end_run() -> void:
 	if not is_playing:
 		return
 	is_playing = false
+	var is_new_high_score := false
 	if hallucinations > high_score:
 		high_score = hallucinations
-	emit_signal("game_over", progress, hallucinations)
+		is_new_high_score = true
+	emit_signal("game_over", progress, hallucinations, is_new_high_score)
