@@ -51,6 +51,7 @@ var bonus_defs: Array = []
 @onready var loose_label: Label = $UI/LooseHallucinationsLabel
 @onready var game_over_panel: Control = $UI/GameOverPanel
 @onready var new_high_score_banner: Control = $UI/NewHighScoreBanner
+@onready var system_corrupted_banner: Control = $UI/SystemCorruptedBanner
 @onready var final_score_label: Label = $UI/GameOverPanel/VBoxContainer/FinalScoreLabel
 @onready var final_progress_label: Label = $UI/GameOverPanel/VBoxContainer/FinalProgressLabel
 @onready var narrator: Control = $UI/Narrator
@@ -66,6 +67,8 @@ var score_timer: float = 0.0
 var _loose_flash_tween: Tween
 var _funky_mode_active: bool = false
 var _incoherent_timer: Timer
+var _system_corrupted: bool = false
+var _corruption_flash_tween: Tween
 
 func _ready() -> void:
 	rng.randomize()
@@ -80,6 +83,7 @@ func _ready() -> void:
 	Game.hallucinations_changed.connect(_on_hallucinations_changed)
 	Game.loose_hallucinations_changed.connect(_on_loose_hallucinations_changed)
 	Game.game_over.connect(_on_game_over)
+	Game.system_corrupted.connect(_on_system_corrupted)
 	player.died.connect(_on_player_died)
 	_incoherent_timer = Timer.new()
 	_incoherent_timer.one_shot = true
@@ -101,6 +105,11 @@ func start_game() -> void:
 	Game.start_run()
 	game_over_panel.visible = false
 	new_high_score_banner.hide_banner()
+	system_corrupted_banner.visible = false
+	_system_corrupted = false
+	if _corruption_flash_tween and _corruption_flash_tween.is_valid():
+		_corruption_flash_tween.kill()
+	system_corrupted_banner.modulate = Color(1, 1, 1, 1)
 	_on_progress_changed(0)
 	_on_hallucinations_changed(0)
 	_reset_loose_ui()
@@ -223,6 +232,8 @@ func _on_loose_hallucinations_changed(new_value: int) -> void:
 		_start_loose_flash()
 	if new_value >= 4 and not _funky_mode_active:
 		_enable_funky_mode()
+	if new_value >= 8:
+		player.set_ambient_shake(true)
 
 func _start_loose_flash() -> void:
 	if _loose_flash_tween and _loose_flash_tween.is_valid():
@@ -253,6 +264,11 @@ func _stop_funky_effects() -> void:
 	loose_label.modulate = Color(1, 1, 1, 1)
 	if crt_rect.material:
 		crt_rect.material.set_shader_parameter("funky_strength", 0.0)
+	player.set_ambient_shake(false)
+
+func _on_system_corrupted() -> void:
+	_system_corrupted = true
+	player.die()
 
 func _reset_loose_ui() -> void:
 	_stop_funky_effects()
@@ -269,6 +285,15 @@ func _on_game_over(
 	final_progress_label.text = "Progress: %d" % final_progress
 	game_over_panel.visible = true
 	_stop_funky_effects()
+	if _system_corrupted:
+		narrator.say_text("Sorry, I got nervous", 0.0)
+		system_corrupted_banner.visible = true
+		_corruption_flash_tween = create_tween()
+		_corruption_flash_tween.set_loops()
+		_corruption_flash_tween.tween_property(system_corrupted_banner, "modulate:a", 0.4, 0.35)
+		_corruption_flash_tween.tween_property(system_corrupted_banner, "modulate:a", 1.0, 0.35)
+		new_high_score_banner.hide_banner()
+		return
 	var line := "Wow you are becoming a PRO!" if is_new_high_score else "That was a good effort"
 	narrator.say_text(line, 0.0)
 	if is_new_high_score:

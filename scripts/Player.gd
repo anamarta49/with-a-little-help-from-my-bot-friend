@@ -38,6 +38,9 @@ var _speed_tween: Tween
 var _camera_base_offset: Vector2
 var current_run_speed: float = 0.0
 var _speed_stage: int = 0
+var _ambient_shake: bool = false
+
+const AMBIENT_SHAKE_STRENGTH := 3.0
 
 func _ready() -> void:
 	_set_crouch(false)
@@ -58,6 +61,7 @@ func reset() -> void:
 	current_run_speed = run_speed
 	if _speed_tween and _speed_tween.is_valid():
 		_speed_tween.kill()
+	set_ambient_shake(false)
 
 func _physics_process(delta: float) -> void:
 	if is_dead:
@@ -83,6 +87,7 @@ func _physics_process(delta: float) -> void:
 
 	_update_run_bob(delta, on_floor)
 	dust_trail.emitting = on_floor and not is_crouching
+	_update_ambient_shake()
 
 	if global_position.y > fall_death_y:
 		die()
@@ -151,6 +156,22 @@ func _play_landing() -> void:
 		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	_squash_tween.tween_property(visual, "scale", Vector2.ONE, 0.15) \
 		.set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
+
+func set_ambient_shake(active: bool) -> void:
+	_ambient_shake = active
+	if not active and not (_shake_tween and _shake_tween.is_valid() and _shake_tween.is_running()):
+		camera.offset = _camera_base_offset
+
+func _update_ambient_shake() -> void:
+	if not _ambient_shake:
+		return
+	# Let a one-off landing/death shake finish uninterrupted before layering in jitter.
+	if _shake_tween and _shake_tween.is_valid() and _shake_tween.is_running():
+		return
+	camera.offset = _camera_base_offset + Vector2(
+		randf_range(-AMBIENT_SHAKE_STRENGTH, AMBIENT_SHAKE_STRENGTH),
+		randf_range(-AMBIENT_SHAKE_STRENGTH, AMBIENT_SHAKE_STRENGTH)
+	)
 
 func _shake_camera(strength: float, duration: float) -> void:
 	if _shake_tween and _shake_tween.is_valid():

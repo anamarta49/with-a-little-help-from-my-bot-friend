@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://fmain01"]
+[gd_scene load_steps=9 format=3 uid="uid://fmain01"]
 
 [ext_resource type="Script" path="res://scripts/Main.gd" id="1"]
 [ext_resource type="PackedScene" uid="uid://b2xplayer01" path="res://scenes/Player.tscn" id="2"]
@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://parallaxbg01" path="res://scenes/ParallaxBG.tscn" id="4"]
 [ext_resource type="Shader" path="res://shaders/crt_overlay.gdshader" id="5"]
 [ext_resource type="Script" path="res://scripts/NewHighScoreBanner.gd" id="6"]
+[ext_resource type="PackedScene" path="res://scenes/SkullIcon.tscn" id="7"]
 
 [sub_resource type="ShaderMaterial" id="CrtMat"]
 shader = ExtResource("5")
@@ -90,6 +91,42 @@ offset_right = 0.0
 offset_bottom = -150.0
 mouse_filter = 2
 script = ExtResource("6")
+
+[node name="SystemCorruptedBanner" type="Control" parent="UI"]
+visible = false
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -160.0
+offset_top = -210.0
+offset_right = 160.0
+offset_bottom = -210.0
+mouse_filter = 2
+
+[node name="VBox" type="VBoxContainer" parent="UI/SystemCorruptedBanner"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -160.0
+offset_top = -34.0
+offset_right = 160.0
+offset_bottom = 34.0
+alignment = 1
+
+[node name="Skull" parent="UI/SystemCorruptedBanner/VBox" instance=ExtResource("7")]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="Label" type="Label" parent="UI/SystemCorruptedBanner/VBox"]
+layout_mode = 2
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 32
+theme_override_colors/font_color = Color(0.95, 0.1, 0.1, 1)
+text = "SYSTEM CORRUPTED - ERROR_000VT4 - exceeded loose hallucination limit"
 
 [node name="VBoxContainer" type="VBoxContainer" parent="UI/GameOverPanel"]
 layout_mode = 1

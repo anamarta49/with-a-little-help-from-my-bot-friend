@@ -14,6 +14,8 @@ signal hallucinations_changed(new_value: int)
 signal loose_hallucinations_changed(new_value: int)
 signal game_over(final_progress: int, final_hallucinations: int, is_new_high_score: bool)
 signal game_started
+## Fired once, when missed hallucinations reach the fatal threshold.
+signal system_corrupted
 
 var progress: int = 0
 var hallucinations: int = 0
@@ -43,12 +45,17 @@ func add_hallucination(amount: int) -> void:
 	hallucinations += amount
 	emit_signal("hallucinations_changed", hallucinations)
 
+## Missed hallucinations at/above this count corrupt the system -- instant game over.
+const SYSTEM_CORRUPTION_THRESHOLD := 10
+
 ## Called when a camouflaged hallucination scrolls past uncaught.
 func add_loose_hallucination() -> void:
 	if not is_playing:
 		return
 	loose_hallucinations += 1
 	emit_signal("loose_hallucinations_changed", loose_hallucinations)
+	if loose_hallucinations >= SYSTEM_CORRUPTION_THRESHOLD:
+		emit_signal("system_corrupted")
 
 func end_run() -> void:
 	if not is_playing:
