@@ -7,6 +7,12 @@ signal died
 @export var jump_velocity: float = -620.0
 @export var fall_death_y: float = 500.0
 
+## Speed milestones: progress thresholds at which the run speed steps up.
+const SPEED_STAGE_1_PROGRESS := 300
+const SPEED_STAGE_1_SPEED := 420.0
+const SPEED_STAGE_2_PROGRESS := 1300
+const SPEED_STAGE_2_SPEED := 520.0
+
 const STAND_VISUAL_HEIGHT := 64.0
 const CROUCH_VISUAL_HEIGHT := 32.0
 const BOB_SPEED := 14.0
@@ -28,11 +34,16 @@ var _was_on_floor: bool = true
 var _bob_time: float = 0.0
 var _squash_tween: Tween
 var _shake_tween: Tween
+var _speed_tween: Tween
 var _camera_base_offset: Vector2
+var current_run_speed: float = 0.0
+var _speed_stage: int = 0
 
 func _ready() -> void:
 	_set_crouch(false)
 	_camera_base_offset = camera.offset
+	current_run_speed = run_speed
+	Game.progress_changed.connect(_on_progress_changed)
 
 func reset() -> void:
 	is_dead = false
@@ -43,6 +54,10 @@ func reset() -> void:
 	visual.scale = Vector2.ONE
 	_set_crouch(false)
 	set_physics_process(true)
+	_speed_stage = 0
+	current_run_speed = run_speed
+	if _speed_tween and _speed_tween.is_valid():
+		_speed_tween.kill()
 
 func _physics_process(delta: float) -> void:
 	if is_dead:
@@ -58,7 +73,7 @@ func _physics_process(delta: float) -> void:
 	if wants_crouch != is_crouching:
 		_set_crouch(wants_crouch)
 
-	velocity.x = run_speed
+	velocity.x = current_run_speed
 	move_and_slide()
 
 	var on_floor := is_on_floor()
@@ -71,6 +86,26 @@ func _physics_process(delta: float) -> void:
 
 	if global_position.y > fall_death_y:
 		die()
+
+func _on_progress_changed(new_value: int) -> void:
+	var target_stage := 0
+	if new_value >= SPEED_STAGE_2_PROGRESS:
+		target_stage = 2
+	elif new_value >= SPEED_STAGE_1_PROGRESS:
+		target_stage = 1
+	if target_stage == _speed_stage:
+		return
+	_speed_stage = target_stage
+	var target_speed := run_speed
+	if target_stage == 1:
+		target_speed = SPEED_STAGE_1_SPEED
+	elif target_stage == 2:
+		target_speed = SPEED_STAGE_2_SPEED
+	if _speed_tween and _speed_tween.is_valid():
+		_speed_tween.kill()
+	_speed_tween = create_tween()
+	_speed_tween.tween_property(self, "current_run_speed", target_speed, 1.2) \
+		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 
 func _update_run_bob(delta: float, on_floor: bool) -> void:
 	var h := CROUCH_VISUAL_HEIGHT if is_crouching else STAND_VISUAL_HEIGHT
