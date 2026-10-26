@@ -7,11 +7,14 @@ signal died
 @export var jump_velocity: float = -620.0
 @export var fall_death_y: float = 500.0
 
-## Speed milestones: progress thresholds at which the run speed steps up.
-const SPEED_STAGE_1_PROGRESS := 300
-const SPEED_STAGE_1_SPEED := 420.0
-const SPEED_STAGE_2_PROGRESS := 1300
-const SPEED_STAGE_2_SPEED := 520.0
+## Speed ramp: every SPEED_STAGE_INTERVAL progress points the run speed steps
+## up, with each step smaller than the last as it approaches SPEED_CAP --
+## keeps things exciting without ever becoming impossible to react to.
+const SPEED_STAGE_INTERVAL := 300
+const SPEED_CAP := 900.0
+## Lower = increments shrink faster (approaches the cap sooner).
+const SPEED_DECAY := 0.82
+const SPEED_RAMP_DURATION := 1.2
 
 const STAND_VISUAL_HEIGHT := 64.0
 const CROUCH_VISUAL_HEIGHT := 32.0
@@ -93,23 +96,17 @@ func _physics_process(delta: float) -> void:
 		die()
 
 func _on_progress_changed(new_value: int) -> void:
-	var target_stage := 0
-	if new_value >= SPEED_STAGE_2_PROGRESS:
-		target_stage = 2
-	elif new_value >= SPEED_STAGE_1_PROGRESS:
-		target_stage = 1
+	var target_stage: int = new_value / SPEED_STAGE_INTERVAL
 	if target_stage == _speed_stage:
 		return
 	_speed_stage = target_stage
-	var target_speed := run_speed
-	if target_stage == 1:
-		target_speed = SPEED_STAGE_1_SPEED
-	elif target_stage == 2:
-		target_speed = SPEED_STAGE_2_SPEED
+	# Exponentially approach SPEED_CAP -- each stage's increment is smaller
+	# than the last, so the ramp never becomes unplayably fast.
+	var target_speed: float = SPEED_CAP - (SPEED_CAP - run_speed) * pow(SPEED_DECAY, target_stage)
 	if _speed_tween and _speed_tween.is_valid():
 		_speed_tween.kill()
 	_speed_tween = create_tween()
-	_speed_tween.tween_property(self, "current_run_speed", target_speed, 1.2) \
+	_speed_tween.tween_property(self, "current_run_speed", target_speed, SPEED_RAMP_DURATION) \
 		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 
 func _update_run_bob(delta: float, on_floor: bool) -> void:
