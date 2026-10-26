@@ -213,8 +213,8 @@ func _on_progress_changed(new_value: int) -> void:
 	score_label.text = "Progress: %d" % new_value
 
 func _on_hallucinations_changed(new_value: int) -> void:
-	hallucinations_label.text = "Hallucinations Caught: %d" % new_value
-	high_score_label.text = "Best: %d" % Game.high_score
+	hallucinations_label.text = "Hallucinations Caught: %s" % Game.format_memory(new_value)
+	high_score_label.text = "Best: %s" % Game.format_memory(Game.high_score)
 	if new_value > 0:
 		_pop_label(hallucinations_label)
 
@@ -285,8 +285,8 @@ func _reset_loose_ui() -> void:
 func _on_game_over(
 	final_progress: int, final_hallucinations: int, is_new_high_score: bool
 ) -> void:
-	final_score_label.text = "Hallucinations Caught: %d   Best: %d" % [
-		final_hallucinations, Game.high_score
+	final_score_label.text = "Hallucinations Caught: %s   Best: %s" % [
+		Game.format_memory(final_hallucinations), Game.format_memory(Game.high_score)
 	]
 	final_progress_label.text = "Progress: %d" % final_progress
 	game_over_panel.visible = true

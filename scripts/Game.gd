@@ -5,9 +5,10 @@ extends Node
 ## Two scores are tracked separately:
 ## - progress: points earned just from surviving/running (distance); a flavor
 ##   metric only, it does not affect the high score.
-## - hallucinations: points earned from catching camouflaged bonus pickups
+## - hallucinations: kB earned from catching camouflaged bonus pickups
 ##   ("hallucinations" the narrator bot spots for you); this is the real score
-##   that the high score is based on.
+##   that the high score is based on. The raw int is always in kB (a standard
+##   catch is worth 100); use format_memory() to display it as kB/MB/GB.
 
 signal progress_changed(new_value: int)
 signal hallucinations_changed(new_value: int)
@@ -66,3 +67,20 @@ func end_run() -> void:
 		high_score = hallucinations
 		is_new_high_score = true
 	emit_signal("game_over", progress, hallucinations, is_new_high_score)
+
+## Formats a kB amount as a human-readable memory size: kB under 1000,
+## MB under 1,000,000, GB beyond that (doesn't bother with anything bigger).
+func format_memory(kb: int) -> String:
+	if kb < 1000:
+		return "%dkB" % kb
+	elif kb < 1_000_000:
+		return _format_unit(kb / 1000.0, "MB")
+	else:
+		return _format_unit(kb / 1_000_000.0, "GB")
+
+## Rounds to 2 decimals and trims trailing zeros (e.g. 2.00 -> "2", 2.50 -> "2.5").
+func _format_unit(value: float, unit: String) -> String:
+	var text := String.num(value, 2)
+	if text.contains("."):
+		text = text.rstrip("0").rstrip(".")
+	return text + unit
