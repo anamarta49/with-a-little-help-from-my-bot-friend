@@ -1,8 +1,9 @@
-[gd_scene load_steps=5 format=3 uid="uid://nintro01"]
+[gd_scene load_steps=6 format=3 uid="uid://nintro01"]
 
 [ext_resource type="Script" path="res://scripts/Intro.gd" id="1"]
 [ext_resource type="PackedScene" uid="uid://gnarrator01" path="res://scenes/Narrator.tscn" id="2"]
 [ext_resource type="Shader" path="res://shaders/crt_overlay.gdshader" id="3"]
+[ext_resource type="Script" path="res://scripts/ArrowIcon.gd" id="4"]
 
 [sub_resource type="StyleBoxFlat" id="ChoiceStyle"]
 bg_color = Color(0.08, 0.08, 0.1, 0.95)
@@ -15,6 +16,94 @@ corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="BoxOutlineStyle"]
+bg_color = Color(0, 0, 0, 0)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.92, 0.92, 0.95, 1)
+
+[sub_resource type="StyleBoxFlat" id="YesButtonNormal"]
+bg_color = Color(0.16, 0.58, 0.28, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.55, 1, 0.65, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+shadow_color = Color(0.3, 0.95, 0.4, 0.55)
+shadow_size = 6
+
+[sub_resource type="StyleBoxFlat" id="YesButtonHover"]
+bg_color = Color(0.22, 0.78, 0.36, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.75, 1, 0.85, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+shadow_color = Color(0.4, 1, 0.5, 0.75)
+shadow_size = 10
+
+[sub_resource type="StyleBoxFlat" id="YesButtonPressed"]
+bg_color = Color(0.1, 0.4, 0.18, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.4, 0.8, 0.5, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="NoButtonNormal"]
+bg_color = Color(0.22, 0.24, 0.28, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.75, 0.78, 0.85, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+shadow_color = Color(0.7, 0.75, 0.85, 0.4)
+shadow_size = 6
+
+[sub_resource type="StyleBoxFlat" id="NoButtonHover"]
+bg_color = Color(0.3, 0.33, 0.38, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.9, 0.92, 1, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+shadow_color = Color(0.8, 0.85, 1, 0.6)
+shadow_size = 10
+
+[sub_resource type="StyleBoxFlat" id="NoButtonPressed"]
+bg_color = Color(0.14, 0.15, 0.18, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.55, 0.58, 0.65, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
 
 [sub_resource type="ShaderMaterial" id="CrtMat"]
 shader = ExtResource("3")
@@ -73,38 +162,181 @@ offset_right = -16.0
 offset_bottom = -16.0
 visible = false
 
-[node name="ChoicePanel" type="Panel" parent="."]
+[node name="KeyMapPanel" type="Panel" parent="."]
 anchor_left = 0.5
-anchor_top = 1.0
+anchor_top = 0.5
 anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -130.0
-offset_top = -90.0
-offset_right = 130.0
-offset_bottom = -20.0
+anchor_bottom = 0.5
+offset_left = -240.0
+offset_top = -170.0
+offset_right = 240.0
+offset_bottom = 170.0
 theme_override_styles/panel = SubResource("ChoiceStyle")
 visible = false
 
-[node name="HBoxContainer" type="HBoxContainer" parent="ChoicePanel"]
+[node name="VBox" type="VBoxContainer" parent="KeyMapPanel"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -90.0
-offset_top = -18.0
-offset_right = 90.0
-offset_bottom = 18.0
-theme_override_constants/separation = 20
+offset_left = -210.0
+offset_top = -140.0
+offset_right = 210.0
+offset_bottom = 140.0
+theme_override_constants/separation = 14
 alignment = 1
 
-[node name="YesButton" type="Button" parent="ChoicePanel/HBoxContainer"]
+[node name="TitleLabel" type="Label" parent="KeyMapPanel/VBox"]
 layout_mode = 2
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.3, 0.95, 0.4, 1)
+theme_override_font_sizes/font_size = 34
+text = "Controls"
+
+[node name="Grid" type="GridContainer" parent="KeyMapPanel/VBox"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/h_separation = 22
+theme_override_constants/v_separation = 12
+columns = 2
+
+[node name="LeftCrouch" type="HBoxContainer" parent="KeyMapPanel/VBox/Grid"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_constants/separation = 6
+
+[node name="ArrowDown" type="Control" parent="KeyMapPanel/VBox/Grid/LeftCrouch"]
+custom_minimum_size = Vector2(18, 26)
+layout_mode = 2
+script = ExtResource("4")
+pointing_down = true
+
+[node name="SlashLabel" type="Label" parent="KeyMapPanel/VBox/Grid/LeftCrouch"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(0.92, 0.92, 0.95, 1)
+theme_override_font_sizes/font_size = 24
+text = "/"
+
+[node name="CtrlLabel" type="Label" parent="KeyMapPanel/VBox/Grid/LeftCrouch"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(0.92, 0.92, 0.95, 1)
+theme_override_font_sizes/font_size = 20
+text = "Ctrl"
+
+[node name="RightCrouch" type="Label" parent="KeyMapPanel/VBox/Grid"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(0.85, 0.85, 0.85, 1)
+theme_override_font_sizes/font_size = 22
+text = "= Crouch"
+
+[node name="LeftJump" type="HBoxContainer" parent="KeyMapPanel/VBox/Grid"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_constants/separation = 6
+
+[node name="ArrowUp" type="Control" parent="KeyMapPanel/VBox/Grid/LeftJump"]
+custom_minimum_size = Vector2(18, 26)
+layout_mode = 2
+script = ExtResource("4")
+
+[node name="SlashLabel" type="Label" parent="KeyMapPanel/VBox/Grid/LeftJump"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(0.92, 0.92, 0.95, 1)
+theme_override_font_sizes/font_size = 24
+text = "/"
+
+[node name="SpaceBarBox" type="Panel" parent="KeyMapPanel/VBox/Grid/LeftJump"]
+custom_minimum_size = Vector2(96, 32)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_styles/panel = SubResource("BoxOutlineStyle")
+
+[node name="MarginContainer" type="MarginContainer" parent="KeyMapPanel/VBox/Grid/LeftJump/SpaceBarBox"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_right = 6
+
+[node name="Label" type="Label" parent="KeyMapPanel/VBox/Grid/LeftJump/SpaceBarBox/MarginContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.92, 0.92, 0.95, 1)
+theme_override_font_sizes/font_size = 18
+horizontal_alignment = 1
+vertical_alignment = 1
+text = "space-bar"
+
+[node name="RightJump" type="Label" parent="KeyMapPanel/VBox/Grid"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(0.85, 0.85, 0.85, 1)
+theme_override_font_sizes/font_size = 22
+text = "= Jump"
+
+[node name="LeftFastFall" type="HBoxContainer" parent="KeyMapPanel/VBox/Grid"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_constants/separation = 10
+
+[node name="MidAirLabel" type="Label" parent="KeyMapPanel/VBox/Grid/LeftFastFall"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(0.6, 0.6, 0.65, 1)
+theme_override_font_sizes/font_size = 16
+text = "(mid-air)"
+
+[node name="ComboLabel" type="Label" parent="KeyMapPanel/VBox/Grid/LeftFastFall"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(0.92, 0.92, 0.95, 1)
+theme_override_font_sizes/font_size = 18
+text = "Jump + Crouch"
+
+[node name="RightFastFall" type="Label" parent="KeyMapPanel/VBox/Grid"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(0.85, 0.85, 0.85, 1)
+theme_override_font_sizes/font_size = 22
+text = "= Fast-fall"
+
+[node name="ButtonsRow" type="HBoxContainer" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -115.0
+offset_top = 196.0
+offset_right = 115.0
+offset_bottom = 240.0
+theme_override_constants/separation = 24
+alignment = 1
+visible = false
+
+[node name="YesButton" type="Button" parent="ButtonsRow"]
+custom_minimum_size = Vector2(100, 40)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("YesButtonNormal")
+theme_override_styles/hover = SubResource("YesButtonHover")
+theme_override_styles/pressed = SubResource("YesButtonPressed")
+theme_override_styles/focus = SubResource("YesButtonHover")
 text = "Yes"
 
-[node name="NoButton" type="Button" parent="ChoicePanel/HBoxContainer"]
+[node name="NoButton" type="Button" parent="ButtonsRow"]
+custom_minimum_size = Vector2(100, 40)
 layout_mode = 2
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("NoButtonNormal")
+theme_override_styles/hover = SubResource("NoButtonHover")
+theme_override_styles/pressed = SubResource("NoButtonPressed")
+theme_override_styles/focus = SubResource("NoButtonHover")
 text = "No"
 
 [node name="CrtOverlay" type="CanvasLayer" parent="."]
