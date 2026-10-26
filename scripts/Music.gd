@@ -37,6 +37,9 @@ func _ready() -> void:
 	_ensure_music_bus()
 	add_child(player)
 	player.bus = MUSIC_BUS
+	# Web export requires "Stream" playback (the default "Sample" mode is
+	# silent in HTML5 builds); explicit here so it works on itch.io too.
+	player.playback_type = AudioServer.PLAYBACK_TYPE_STREAM
 	var stream := load(BGM_PATH) as AudioStreamWAV
 	if stream:
 		stream.loop_mode = AudioStreamWAV.LOOP_FORWARD
