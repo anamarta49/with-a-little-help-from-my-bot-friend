@@ -224,15 +224,15 @@ func _on_player_died() -> void:
 	pass
 
 func _on_loose_hallucinations_changed(new_value: int) -> void:
-	loose_label.text = "Loose Hallucinations: %d" % new_value
+	loose_label.text = "Missed Hallucinations: %d" % new_value
 	if new_value >= 1:
 		loose_label.visible = true
-	if new_value >= 3:
+	if new_value >= 2:
 		loose_label.add_theme_font_size_override("font_size", 26)
 		_start_loose_flash()
-	if new_value >= 4 and not _funky_mode_active:
+	if new_value >= 3 and not _funky_mode_active:
 		_enable_funky_mode()
-	if new_value >= 8:
+	if new_value >= 4:
 		player.set_ambient_shake(true)
 
 func _start_loose_flash() -> void:
@@ -274,7 +274,7 @@ func _reset_loose_ui() -> void:
 	_stop_funky_effects()
 	loose_label.visible = false
 	loose_label.add_theme_font_size_override("font_size", 20)
-	loose_label.text = "Loose Hallucinations: 0"
+	loose_label.text = "Missed Hallucinations: 0"
 
 func _on_game_over(
 	final_progress: int, final_hallucinations: int, is_new_high_score: bool

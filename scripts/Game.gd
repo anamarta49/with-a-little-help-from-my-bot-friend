@@ -46,7 +46,7 @@ func add_hallucination(amount: int) -> void:
 	emit_signal("hallucinations_changed", hallucinations)
 
 ## Missed hallucinations at/above this count corrupt the system -- instant game over.
-const SYSTEM_CORRUPTION_THRESHOLD := 10
+const SYSTEM_CORRUPTION_THRESHOLD := 5
 
 ## Called when a camouflaged hallucination scrolls past uncaught.
 func add_loose_hallucination() -> void:
