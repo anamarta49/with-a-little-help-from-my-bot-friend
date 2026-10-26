@@ -1,27 +1,32 @@
-[gd_scene load_steps=9 format=3 uid="uid://fmain01"]
+[gd_scene format=3 uid="uid://fmain01"]
 
-[ext_resource type="Script" path="res://scripts/Main.gd" id="1"]
+[ext_resource type="Script" uid="uid://pq32x80jqai6" path="res://scripts/Main.gd" id="1"]
 [ext_resource type="PackedScene" uid="uid://b2xplayer01" path="res://scenes/Player.tscn" id="2"]
 [ext_resource type="PackedScene" uid="uid://gnarrator01" path="res://scenes/Narrator.tscn" id="3"]
 [ext_resource type="PackedScene" uid="uid://parallaxbg01" path="res://scenes/ParallaxBG.tscn" id="4"]
-[ext_resource type="Shader" path="res://shaders/crt_overlay.gdshader" id="5"]
-[ext_resource type="Script" path="res://scripts/NewHighScoreBanner.gd" id="6"]
-[ext_resource type="PackedScene" path="res://scenes/SkullIcon.tscn" id="7"]
+[ext_resource type="Shader" uid="uid://mkkxkkelp4d1" path="res://shaders/crt_overlay.gdshader" id="5"]
+[ext_resource type="Script" uid="uid://djlptfewdk0k8" path="res://scripts/NewHighScoreBanner.gd" id="6"]
+[ext_resource type="PackedScene" uid="uid://skullicon01" path="res://scenes/SkullIcon.tscn" id="7"]
+[ext_resource type="PackedScene" path="res://scenes/TipIcon.tscn" id="8"]
 
 [sub_resource type="ShaderMaterial" id="CrtMat"]
 shader = ExtResource("5")
+shader_parameter/vignette_strength = 1.1
+shader_parameter/scanline_strength = 0.12
+shader_parameter/scanline_count = 270.0
+shader_parameter/funky_strength = 0.0
 
-[node name="Main" type="Node2D"]
+[node name="Main" type="Node2D" unique_id=1286667774]
 script = ExtResource("1")
 
-[node name="ParallaxBG" parent="." instance=ExtResource("4")]
+[node name="ParallaxBG" parent="." unique_id=1449101334 instance=ExtResource("4")]
 
-[node name="Player" parent="." instance=ExtResource("2")]
+[node name="Player" parent="." unique_id=1372509953 instance=ExtResource("2")]
 position = Vector2(100, 0)
 
-[node name="UI" type="CanvasLayer" parent="."]
+[node name="UI" type="CanvasLayer" parent="." unique_id=1528714643]
 
-[node name="HallucinationsLabel" type="Label" parent="UI"]
+[node name="HallucinationsLabel" type="Label" parent="UI" unique_id=1706427450]
 offset_left = 16.0
 offset_top = 12.0
 offset_right = 360.0
@@ -29,7 +34,7 @@ offset_bottom = 46.0
 theme_override_font_sizes/font_size = 28
 text = "Hallucinations Caught: 0"
 
-[node name="HighScoreLabel" type="Label" parent="UI"]
+[node name="HighScoreLabel" type="Label" parent="UI" unique_id=1054183706]
 offset_left = 16.0
 offset_top = 50.0
 offset_right = 260.0
@@ -37,37 +42,52 @@ offset_bottom = 74.0
 theme_override_font_sizes/font_size = 20
 text = "Best: 0"
 
-[node name="ScoreLabel" type="Label" parent="UI"]
+[node name="ScoreLabel" type="Label" parent="UI" unique_id=999238636]
 offset_left = 16.0
 offset_top = 78.0
 offset_right = 220.0
 offset_bottom = 98.0
-theme_override_font_sizes/font_size = 16
 theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+theme_override_font_sizes/font_size = 16
 text = "Progress: 0"
 
-[node name="LooseHallucinationsLabel" type="Label" parent="UI"]
+[node name="LooseHallucinationsLabel" type="Label" parent="UI" unique_id=1987318530]
 visible = false
 offset_left = 16.0
 offset_top = 102.0
 offset_right = 340.0
 offset_bottom = 130.0
-theme_override_font_sizes/font_size = 20
 theme_override_colors/font_color = Color(0.95, 0.1, 0.15, 1)
+theme_override_font_sizes/font_size = 20
 text = "Missed Hallucinations: 0"
 
-[node name="Narrator" parent="UI" instance=ExtResource("3")]
+[node name="KeyInfoLabel" type="Label" parent="UI" unique_id=1082380490]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -220.0
+offset_top = 12.0
+offset_right = -8.0
+offset_bottom = 32.0
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 14
+text = "P / ESC: Pause"
+horizontal_alignment = 2
+
+[node name="Narrator" parent="UI" unique_id=1531612603 instance=ExtResource("3")]
+layout_mode = 3
 anchors_preset = 3
 anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = -236.0
-offset_top = -202.0
+offset_top = -222.0
 offset_right = -16.0
 offset_bottom = -16.0
 
-[node name="GameOverPanel" type="Panel" parent="UI"]
+[node name="GameOverPanel" type="Panel" parent="UI" unique_id=493001922]
+visible = false
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
@@ -77,58 +97,8 @@ offset_left = -200.0
 offset_top = -100.0
 offset_right = 200.0
 offset_bottom = 100.0
-visible = false
 
-[node name="NewHighScoreBanner" type="Control" parent="UI"]
-visible = false
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = 0.0
-offset_top = -150.0
-offset_right = 0.0
-offset_bottom = -150.0
-mouse_filter = 2
-script = ExtResource("6")
-
-[node name="SystemCorruptedBanner" type="Control" parent="UI"]
-visible = false
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -160.0
-offset_top = -210.0
-offset_right = 160.0
-offset_bottom = -210.0
-mouse_filter = 2
-
-[node name="VBox" type="VBoxContainer" parent="UI/SystemCorruptedBanner"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -160.0
-offset_top = -34.0
-offset_right = 160.0
-offset_bottom = 34.0
-alignment = 1
-
-[node name="Skull" parent="UI/SystemCorruptedBanner/VBox" instance=ExtResource("7")]
-layout_mode = 2
-size_flags_horizontal = 4
-
-[node name="Label" type="Label" parent="UI/SystemCorruptedBanner/VBox"]
-layout_mode = 2
-horizontal_alignment = 1
-theme_override_font_sizes/font_size = 32
-theme_override_colors/font_color = Color(0.95, 0.1, 0.1, 1)
-text = "SYSTEM CORRUPTED - ERROR_000VT4 - You have failed to contain the hallucinations."
-
-[node name="VBoxContainer" type="VBoxContainer" parent="UI/GameOverPanel"]
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/GameOverPanel" unique_id=812615740]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -139,36 +109,179 @@ offset_left = -180.0
 offset_top = -80.0
 offset_right = 180.0
 offset_bottom = 80.0
+grow_horizontal = 2
+grow_vertical = 2
 alignment = 1
 
-[node name="TitleLabel" type="Label" parent="UI/GameOverPanel/VBoxContainer"]
+[node name="TitleLabel" type="Label" parent="UI/GameOverPanel/VBoxContainer" unique_id=1784101284]
 layout_mode = 2
-horizontal_alignment = 1
 theme_override_font_sizes/font_size = 28
 text = "Game Over"
-
-[node name="FinalScoreLabel" type="Label" parent="UI/GameOverPanel/VBoxContainer"]
-layout_mode = 2
 horizontal_alignment = 1
-autowrap_mode = 2
+
+[node name="FinalScoreLabel" type="Label" parent="UI/GameOverPanel/VBoxContainer" unique_id=1817645579]
+layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "Hallucinations Caught: 0   Best: 0"
-
-[node name="FinalProgressLabel" type="Label" parent="UI/GameOverPanel/VBoxContainer"]
-layout_mode = 2
 horizontal_alignment = 1
-theme_override_font_sizes/font_size = 14
-theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
-text = "Progress: 0"
+autowrap_mode = 2
 
-[node name="RestartButton" type="Button" parent="UI/GameOverPanel/VBoxContainer"]
+[node name="FinalProgressLabel" type="Label" parent="UI/GameOverPanel/VBoxContainer" unique_id=738782616]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 14
+text = "Progress: 0"
+horizontal_alignment = 1
+
+[node name="RestartButton" type="Button" parent="UI/GameOverPanel/VBoxContainer" unique_id=1469537773]
 layout_mode = 2
 text = "Restart (R)"
 
-[node name="CrtOverlay" type="CanvasLayer" parent="."]
+[node name="PauseOverlay" type="Panel" parent="UI" unique_id=369767182]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -160.0
+offset_top = -80.0
+offset_right = 160.0
+offset_bottom = 80.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/PauseOverlay" unique_id=1315112050]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -140.0
+offset_top = -60.0
+offset_right = 140.0
+offset_bottom = 60.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="TitleLabel" type="Label" parent="UI/PauseOverlay/VBoxContainer" unique_id=1614576027]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Paused"
+horizontal_alignment = 1
+
+[node name="HintLabel" type="Label" parent="UI/PauseOverlay/VBoxContainer" unique_id=397736384]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 16
+text = "Press P or ESC to resume"
+horizontal_alignment = 1
+
+[node name="ResumeButton" type="Button" parent="UI/PauseOverlay/VBoxContainer" unique_id=1872863030]
+layout_mode = 2
+text = "Resume"
+
+[node name="NewHighScoreBanner" type="Control" parent="UI" unique_id=1395710746]
+visible = false
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_top = -150.0
+offset_bottom = -150.0
+mouse_filter = 2
+script = ExtResource("6")
+
+[node name="SystemCorruptedBanner" type="Control" parent="UI" unique_id=447324706]
+visible = false
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -160.0
+offset_top = -210.0
+offset_right = 160.0
+offset_bottom = -210.0
+mouse_filter = 2
+
+[node name="VBox" type="VBoxContainer" parent="UI/SystemCorruptedBanner" unique_id=1075283210]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -160.0
+offset_top = -34.0
+offset_right = 160.0
+offset_bottom = 34.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="Skull" parent="UI/SystemCorruptedBanner/VBox" unique_id=829847712 instance=ExtResource("7")]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="Label" type="Label" parent="UI/SystemCorruptedBanner/VBox" unique_id=424514879]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.1, 0.1, 1)
+theme_override_font_sizes/font_size = 32
+text = "SYSTEM CORRUPTED - ERROR_000VT4 - You have failed to contain the hallucinations."
+horizontal_alignment = 1
+
+[node name="TipOverlay" type="Panel" parent="UI" unique_id=1663179772]
+visible = false
+clip_contents = true
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -460.0
+offset_top = 150.0
+offset_right = 60.0
+offset_bottom = 198.0
+
+[node name="Margin" type="MarginContainer" parent="UI/TipOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 6
+
+[node name="HBox" type="HBoxContainer" parent="UI/TipOverlay/Margin" unique_id=1231620992]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="TipIcon" parent="UI/TipOverlay/Margin/HBox" unique_id=1112474428 instance=ExtResource("8")]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="TipLabel" type="Label" parent="UI/TipOverlay/Margin/HBox" unique_id=948106641]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(0.3, 0.95, 0.4, 1)
+theme_override_font_sizes/font_size = 12
+vertical_alignment = 1
+text = "Tip: Trusty can make mistakes. Real obstacles can be confusing for him. But he is very good at spotting Hallucinations."
+autowrap_mode = 3
+
+[node name="CrtOverlay" type="CanvasLayer" parent="." unique_id=231508013]
 layer = 10
 
-[node name="CrtRect" type="ColorRect" parent="CrtOverlay"]
+[node name="CrtRect" type="ColorRect" parent="CrtOverlay" unique_id=1410848034]
 material = SubResource("CrtMat")
 anchors_preset = 15
 anchor_right = 1.0
@@ -177,3 +290,4 @@ mouse_filter = 2
 color = Color(0, 0, 0, 1)
 
 [connection signal="pressed" from="UI/GameOverPanel/VBoxContainer/RestartButton" to="." method="_on_restart_button_pressed"]
+[connection signal="pressed" from="UI/PauseOverlay/VBoxContainer/ResumeButton" to="." method="_on_resume_button_pressed"]

@@ -4,9 +4,11 @@ extends Control
 @onready var bubble: Panel = $SpeechBubble
 @onready var label: Label = $SpeechBubble/MarginContainer/Label
 @onready var hide_timer: Timer = $HideTimer
-@onready var bot_body: ColorRect = $BotBody
-@onready var eye_left: ColorRect = $BotBody/BotEyeLeft
-@onready var eye_right: ColorRect = $BotBody/BotEyeRight
+@onready var bot_visual: Control = $BotVisual
+@onready var eye_left_top: ColorRect = $BotVisual/BotBody/BotEyeLeftTop
+@onready var eye_left_bottom: ColorRect = $BotVisual/BotBody/BotEyeLeftBottom
+@onready var eye_right_top: ColorRect = $BotVisual/BotBody/BotEyeRightTop
+@onready var eye_right_bottom: ColorRect = $BotVisual/BotBody/BotEyeRightBottom
 
 const ACTION_TEXT := {
 	"jump": "Jump!",
@@ -31,9 +33,16 @@ func _ready() -> void:
 	bubble.visible = false
 	hide_timer.one_shot = true
 	hide_timer.timeout.connect(_on_hide_timer_timeout)
-	_bot_base_y = bot_body.position.y
-	eye_left.pivot_offset = eye_left.size / 2.0
-	eye_right.pivot_offset = eye_right.size / 2.0
+	_bot_base_y = bot_visual.position.y
+	# Top eyelids pivot on their own top edge (stay put, grow downward);
+	# bottom eyelids pivot on their own bottom edge (stay put, grow upward) --
+	# together they close "from the outer edges" toward the middle, like real eyelids.
+	eye_left_top.pivot_offset = Vector2(eye_left_top.size.x / 2.0, 0.0)
+	eye_left_bottom.pivot_offset = Vector2(eye_left_bottom.size.x / 2.0, eye_left_bottom.size.y)
+	eye_right_top.pivot_offset = Vector2(eye_right_top.size.x / 2.0, 0.0)
+	eye_right_bottom.pivot_offset = Vector2(eye_right_bottom.size.x / 2.0, eye_right_bottom.size.y)
+	# Eyes start fully open: eyelid covers collapsed to nothing.
+	_set_eyelids_scale(0.0)
 	_start_idle_bob()
 	_start_blinking()
 
@@ -41,9 +50,9 @@ func _ready() -> void:
 func _start_idle_bob() -> void:
 	var tween := create_tween()
 	tween.set_loops()
-	tween.tween_property(bot_body, "position:y", _bot_base_y - 6.0, 1.1) \
+	tween.tween_property(bot_visual, "position:y", _bot_base_y - 3.0, 1.1) \
 		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	tween.tween_property(bot_body, "position:y", _bot_base_y, 1.1) \
+	tween.tween_property(bot_visual, "position:y", _bot_base_y, 1.1) \
 		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 
 ## Occasional quick blink (eyes squash flat then back) at random intervals.
@@ -57,12 +66,18 @@ func _start_blinking() -> void:
 func _schedule_next_blink() -> void:
 	_blink_timer.start(randf_range(2.0, 5.0))
 
+func _set_eyelids_scale(value: float) -> void:
+	eye_left_top.scale.y = value
+	eye_left_bottom.scale.y = value
+	eye_right_top.scale.y = value
+	eye_right_bottom.scale.y = value
+
+## Occasional quick blink: the eyelid-colored covers grow from the top and
+## bottom edges of each eye to meet in the middle, then shrink back open.
 func _do_blink() -> void:
 	var tween := create_tween()
-	tween.tween_property(eye_left, "scale:y", 0.1, 0.06)
-	tween.parallel().tween_property(eye_right, "scale:y", 0.1, 0.06)
-	tween.tween_property(eye_left, "scale:y", 1.0, 0.08)
-	tween.parallel().tween_property(eye_right, "scale:y", 1.0, 0.08)
+	tween.tween_method(_set_eyelids_scale, 0.0, 1.0, 0.06)
+	tween.tween_method(_set_eyelids_scale, 1.0, 0.0, 0.08)
 	_schedule_next_blink()
 
 func say(action: String, duration: float = 1.4) -> void:

@@ -50,6 +50,8 @@ var bonus_defs: Array = []
 @onready var high_score_label: Label = $UI/HighScoreLabel
 @onready var loose_label: Label = $UI/LooseHallucinationsLabel
 @onready var game_over_panel: Control = $UI/GameOverPanel
+@onready var tip_overlay: Control = $UI/TipOverlay
+@onready var pause_overlay: Control = $UI/PauseOverlay
 @onready var new_high_score_banner: Control = $UI/NewHighScoreBanner
 @onready var system_corrupted_banner: Control = $UI/SystemCorruptedBanner
 @onready var final_score_label: Label = $UI/GameOverPanel/VBoxContainer/FinalScoreLabel
@@ -69,6 +71,7 @@ var _funky_mode_active: bool = false
 var _incoherent_timer: Timer
 var _system_corrupted: bool = false
 var _corruption_flash_tween: Tween
+var is_paused: bool = false
 
 func _ready() -> void:
 	rng.randomize()
@@ -104,12 +107,15 @@ func start_game() -> void:
 	player.reset()
 	Game.start_run()
 	game_over_panel.visible = false
+	tip_overlay.visible = false
 	new_high_score_banner.hide_banner()
 	system_corrupted_banner.visible = false
 	_system_corrupted = false
 	if _corruption_flash_tween and _corruption_flash_tween.is_valid():
 		_corruption_flash_tween.kill()
 	system_corrupted_banner.modulate = Color(1, 1, 1, 1)
+	pause_overlay.visible = false
+	is_paused = false
 	_on_progress_changed(0)
 	_on_hallucinations_changed(0)
 	_reset_loose_ui()
@@ -117,7 +123,7 @@ func start_game() -> void:
 		_spawn_tile()
 
 func _process(delta: float) -> void:
-	if not Game.is_playing:
+	if not Game.is_playing or is_paused:
 		return
 
 	while next_spawn_x < player.global_position.x + spawn_ahead:
@@ -284,6 +290,7 @@ func _on_game_over(
 	]
 	final_progress_label.text = "Progress: %d" % final_progress
 	game_over_panel.visible = true
+	tip_overlay.visible = true
 	_stop_funky_effects()
 	if _system_corrupted:
 		narrator.say_text("Sorry, I got nervous", 0.0)
@@ -302,8 +309,21 @@ func _on_game_over(
 		new_high_score_banner.hide_banner()
 
 func _unhandled_input(event: InputEvent) -> void:
-	if game_over_panel.visible and event.is_action_pressed("restart"):
+	if game_over_panel.visible and (event.is_action_pressed("restart") or event.is_action_pressed("ui_accept")):
 		start_game()
+		return
+	if event.is_action_pressed("pause") and Game.is_playing and not game_over_panel.visible:
+		_toggle_pause()
+
+func _toggle_pause() -> void:
+	is_paused = not is_paused
+	pause_overlay.visible = is_paused
+	player.set_paused(is_paused)
+	if _incoherent_timer:
+		_incoherent_timer.paused = is_paused
+
+func _on_resume_button_pressed() -> void:
+	_toggle_pause()
 
 func _on_restart_button_pressed() -> void:
 	start_game()

@@ -35,6 +35,7 @@ const BOB_AMOUNT := 3.0
 var gravity: float = ProjectSettings.get_setting("physics/2d/default_gravity")
 var is_crouching: bool = false
 var is_dead: bool = false
+var is_paused: bool = false
 var _was_on_floor: bool = true
 var _bob_time: float = 0.0
 var _squash_tween: Tween
@@ -55,6 +56,7 @@ func _ready() -> void:
 
 func reset() -> void:
 	is_dead = false
+	is_paused = false
 	velocity = Vector2.ZERO
 	global_position = Vector2(100, 0)
 	_was_on_floor = true
@@ -69,7 +71,7 @@ func reset() -> void:
 	set_ambient_shake(false)
 
 func _physics_process(delta: float) -> void:
-	if is_dead:
+	if is_dead or is_paused:
 		return
 
 	velocity.y += gravity * delta
@@ -172,6 +174,9 @@ func set_ambient_shake(active: bool) -> void:
 	_ambient_shake = active
 	if not active and not (_shake_tween and _shake_tween.is_valid() and _shake_tween.is_running()):
 		camera.offset = _camera_base_offset
+
+func set_paused(value: bool) -> void:
+	is_paused = value
 
 func _update_ambient_shake() -> void:
 	if not _ambient_shake:
