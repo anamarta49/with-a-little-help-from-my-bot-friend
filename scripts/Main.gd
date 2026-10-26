@@ -92,6 +92,7 @@ func _ready() -> void:
 	_incoherent_timer.one_shot = true
 	add_child(_incoherent_timer)
 	_incoherent_timer.timeout.connect(_on_incoherent_timer_timeout)
+	Music.start()
 	start_game()
 
 func start_game() -> void:
@@ -253,6 +254,7 @@ func _enable_funky_mode() -> void:
 	_funky_mode_active = true
 	if crt_rect.material:
 		crt_rect.material.set_shader_parameter("funky_strength", 1.0)
+	Music.set_broken(true)
 	_incoherent_timer.start(rng.randf_range(2.5, 4.5))
 
 func _on_incoherent_timer_timeout() -> void:
@@ -270,6 +272,7 @@ func _stop_funky_effects() -> void:
 	loose_label.modulate = Color(1, 1, 1, 1)
 	if crt_rect.material:
 		crt_rect.material.set_shader_parameter("funky_strength", 0.0)
+	Music.set_broken(false)
 	player.set_ambient_shake(false)
 
 func _on_system_corrupted() -> void:
@@ -319,6 +322,7 @@ func _toggle_pause() -> void:
 	is_paused = not is_paused
 	pause_overlay.visible = is_paused
 	player.set_paused(is_paused)
+	Music.set_menu_mode(is_paused)
 	if _incoherent_timer:
 		_incoherent_timer.paused = is_paused
 

@@ -91,6 +91,9 @@ func _physics_process(delta: float) -> void:
 	velocity.x = current_run_speed
 	move_and_slide()
 
+	var speed_ratio: float = (current_run_speed - run_speed) / (SPEED_CAP - run_speed)
+	Music.set_speed_ratio(speed_ratio)
+
 	var on_floor := is_on_floor()
 	if on_floor and not _was_on_floor:
 		_play_landing()

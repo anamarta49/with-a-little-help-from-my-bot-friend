@@ -40,6 +40,7 @@ func _ready() -> void:
 	story_label.visible_ratio = 0.0
 	yes_button.pressed.connect(_on_yes_pressed)
 	no_button.pressed.connect(_on_no_pressed)
+	Music.start()
 	_start_typing()
 
 func _start_typing() -> void:
