@@ -6,6 +6,8 @@ signal died
 @export var run_speed: float = 320.0
 @export var jump_velocity: float = -620.0
 @export var fall_death_y: float = 500.0
+## Instant downward speed applied when crouch is pressed mid-air (fast-fall slam).
+@export var fast_fall_speed: float = 1700.0
 
 ## Speed ramp: every SPEED_STAGE_INTERVAL progress points the run speed steps
 ## up, with each step smaller than the last as it approaches SPEED_CAP --
@@ -76,6 +78,10 @@ func _physics_process(delta: float) -> void:
 		velocity.y = jump_velocity
 		_play_jump_stretch()
 
+	if not is_on_floor() and Input.is_action_just_pressed("crouch") and velocity.y < fast_fall_speed:
+		velocity.y = fast_fall_speed
+		_play_fast_fall_stretch()
+
 	var wants_crouch := Input.is_action_pressed("crouch") and is_on_floor()
 	if wants_crouch != is_crouching:
 		_set_crouch(wants_crouch)
@@ -140,6 +146,14 @@ func _play_jump_stretch() -> void:
 		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	_squash_tween.tween_property(visual, "scale", Vector2.ONE, 0.18) \
 		.set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
+
+func _play_fast_fall_stretch() -> void:
+	if _squash_tween and _squash_tween.is_valid():
+		_squash_tween.kill()
+	visual.pivot_offset = Vector2(20, 0)
+	_squash_tween = create_tween()
+	_squash_tween.tween_property(visual, "scale", Vector2(0.7, 1.35), 0.1) \
+		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 
 func _play_landing() -> void:
 	land_burst.restart()
