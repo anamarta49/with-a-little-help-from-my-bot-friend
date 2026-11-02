@@ -4,6 +4,9 @@
 export.cfg
 *.translation
 
+# IDE-specific project files
+.idea/
+
 # OS/editor junk
 .DS_Store
 Thumbs.db
