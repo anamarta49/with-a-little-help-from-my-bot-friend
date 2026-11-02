@@ -17,7 +17,11 @@ on the obstacles rather than lean on him.
 ## Play it
 
 - **Browser (itch.io):** https://martadev.itch.io/with-a-little-help-from-my-bot-friend
-- **Windows:** download `With a Little Help from my Bot Friend.exe` and run it directly.
+- **Windows:** the `.exe` isn't included in this repo (build artifacts are gitignored).
+  Open the project in [Godot 4.3](https://godotengine.org/download/archive/#4.3) and
+  export it yourself — see [Exporting projects](https://docs.godotengine.org/en/stable/tutorials/export/exporting_projects.html)
+  in the official Godot docs, or the [Building / exporting](#building--exporting)
+  section below.
 
 ## Controls
 
@@ -74,5 +78,7 @@ Requires the [Godot 4.3 Engine](https://godotengine.org/download/archive/#4.3).
 - Font: [VT323](https://fonts.google.com/specimen/VT323) by Peter Hull
   (SIL Open Font License)
 - Music: original composition, generated for this project
+- Project code, music, and images were generated with the help of AI
+  (GitHub Copilot CLI), directed and curated by [anamarta49](https://github.com/anamarta49)
 
 Built for the **CTW Game Jam 2026** — theme: *"AI gone wrong."*
