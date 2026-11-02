@@ -9,3 +9,7 @@ export.cfg
 Thumbs.db
 /With a Little Help from my Bot Friend.console.exe
 /With a Little Help from my Bot Friend.exe
+
+# Exported Web build output and its packaged zip
+/web_export/
+/With a Little Help from my Bot Friend - Web.zip
